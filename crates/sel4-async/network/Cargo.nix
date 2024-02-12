@@ -10,7 +10,7 @@ mk {
   package.name = "sel4-async-network";
   dependencies = {
     inherit (localCrates) sel4-async-network-traits;
-    inherit (versions) log;
+    inherit (versions) log embedded-io-async;
     futures = {
       version = versions.futures;
       default-features = false;

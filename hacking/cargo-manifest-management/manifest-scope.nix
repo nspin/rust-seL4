@@ -91,6 +91,7 @@ in rec {
     async-unsync = "0.2.2";
     cfg-if = "1.0.0";
     clap = "4.4.6";
+    embedded-io-async = "0.6.1";
     fallible-iterator = "0.2.0";
     futures = "0.3.28";
     getrandom = "0.2.10";

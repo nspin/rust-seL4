@@ -16,7 +16,7 @@ mk rec {
     inherit (localCrates)
       sel4-async-network-traits
     ;
-    inherit (versions) log;
+    inherit (versions) log embedded-io-async;
     rustls = rustlsWith [] // (localCrates.rustls or {});
     futures = {
       version = versions.futures;
