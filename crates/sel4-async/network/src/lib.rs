@@ -69,6 +69,13 @@ pub enum TcpSocketError {
     ConnectionResetDuringConnect,
 }
 
+impl embedded_io_async::Error for TcpSocketError {
+    // TODO
+    fn kind(&self) -> embedded_io_async::ErrorKind {
+        embedded_io_async::ErrorKind::Other
+    }
+}
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum DnsError {
     StartQueryError(dns::StartQueryError),
@@ -379,6 +386,38 @@ impl AsyncIO for Socket<tcp::Socket<'static>> {
     ) -> Poll<Result<(), Self::Error>> {
         // TODO
         Poll::Ready(Ok(()))
+    }
+}
+
+impl embedded_io_async::ErrorType for Socket<tcp::Socket<'static>> {
+    type Error = TcpSocketError;
+}
+
+impl embedded_io_async::Read for Socket<tcp::Socket<'static>> {
+    async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+        future::poll_fn(|cx| self.poll_recv(cx, buf)).await
+    }
+}
+
+impl embedded_io_async::ReadReady for Socket<tcp::Socket<'static>> {
+    fn read_ready(&mut self) -> Result<bool, Self::Error> {
+        Ok(self.with(|socket| socket.may_recv()))
+    }
+}
+
+impl embedded_io_async::Write for Socket<tcp::Socket<'static>> {
+    async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+        future::poll_fn(|cx| self.poll_send(cx, buf)).await
+    }
+
+    async fn flush(&mut self) -> Result<(), Self::Error> {
+        future::poll_fn(|cx| self.poll_flush(cx)).await
+    }
+}
+
+impl embedded_io_async::WriteReady for Socket<tcp::Socket<'static>> {
+    fn write_ready(&mut self) -> Result<bool, Self::Error> {
+        Ok(self.with(|socket| socket.may_send()))
     }
 }
 
