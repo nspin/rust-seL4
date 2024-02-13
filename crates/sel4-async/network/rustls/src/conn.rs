@@ -9,12 +9,13 @@
 use core::marker::PhantomData;
 use core::mem;
 use core::ops::DerefMut;
-use core::pin::Pin;
+use core::pin::{pin, Pin};
 use core::task::{self, Poll};
 
 use alloc::sync::Arc;
 
 use embedded_io_async::{Read, ReadReady, Write, WriteReady};
+use futures::prelude::*;
 use futures::Future;
 use rustls::client::{ClientConnectionData, UnbufferedClientConnection};
 use rustls::pki_types::ServerName;
@@ -398,8 +399,7 @@ where
         Poll::Ready(Ok(cursor.into_used()))
     }
 
-    #[cfg(any())]
-    fn poll_flush(
+    fn poll_flush_except_io(
         mut self: Pin<&mut Self>,
         cx: &mut task::Context<'_>,
     ) -> Poll<Result<(), Error<IO::Error>>> {
@@ -417,9 +417,7 @@ where
 
         self.outgoing = outgoing;
 
-        Pin::new(&mut self.io)
-            .poll_flush(cx)
-            .map_err(Error::TransitError)
+        Poll::Ready(Ok(()))
     }
 
     #[cfg(any())]
@@ -441,3 +439,28 @@ where
 {
     type Error = Error<IO::Error>;
 }
+
+// impl<T, D, IO> Read for TlsStream<T, D, IO>
+// where
+//     T: DerefMut<Target = UnbufferedConnectionCommon<D>> + Unpin,
+//     IO: Read + ReadReady + Write + WriteReady + Unpin,
+//     D: SideDataAugmented + Unpin,
+// {
+//     async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+//         future::poll_fn(move |cx| Pin::new(&mut self).poll_read(cx, buf)).await
+//     }
+// }
+
+// impl<T, D, IO> Write for TlsStream<T, D, IO>
+// where
+//     IO: Write + Unpin,
+// {
+//     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+//         future::poll_fn(|cx| Pin::new(self).poll_write(cx, buf)).await
+//     }
+
+//     async fn flush(&mut self) -> Result<(), Self::Error> {
+//         future::poll_fn(|cx| Pin::new(self).poll_flush_except_io(cx)).await?;
+//         self.io.flush().await.map_err(Error::TransitError)
+//     }
+// }
