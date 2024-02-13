@@ -7,9 +7,11 @@
 // Derived from https://github.com/rustls/rustls/pull/1648 by https://github.com/japaric
 
 use alloc::vec::Vec;
-use core::pin::Pin;
+use core::future::Future;
+use core::pin::{pin, Pin};
 use core::task::{self, Poll};
 
+use embedded_io_async::{Read, ReadReady, Write, WriteReady};
 use rustls::unbuffered::InsufficientSizeError;
 
 use sel4_async_network_traits::AsyncIO;
@@ -143,22 +145,27 @@ pub(crate) fn poll_read<IO>(
     cx: &mut task::Context,
 ) -> Result<bool, Error<IO::Error>>
 where
-    IO: AsyncIO + Unpin,
+    IO: Read + ReadReady + Unpin,
 {
     if incoming.unfilled().is_empty() {
         // XXX should this be user configurable?
         incoming.reserve(1024);
     }
 
-    let would_block = match Pin::new(io).poll_read(cx, incoming.unfilled()) {
-        Poll::Ready(res) => {
-            let read = res.map_err(Error::TransitError)?;
-            log::trace!("read {read}B from socket");
-            incoming.advance(read);
-            false
-        }
-
-        Poll::Pending => true,
+    let would_block = if io.read_ready().map_err(Error::TransitError)? {
+        let res = {
+            let fut = pin!(io.read(incoming.unfilled()));
+            match fut.poll(cx) {
+                Poll::Pending => unreachable!(),
+                Poll::Ready(res) => res,
+            }
+        };
+        let read = res.map_err(Error::TransitError)?;
+        log::trace!("read {read}B from socket");
+        incoming.advance(read);
+        false
+    } else {
+        true
     };
 
     Ok(would_block)
@@ -171,20 +178,24 @@ pub(crate) fn poll_write<IO>(
     cx: &mut task::Context,
 ) -> Result<bool, Error<IO::Error>>
 where
-    IO: embedded_io_async::WriteReady + embedded_io_async::Write,
+    IO: Write + WriteReady,
 {
-    Ok(if io.write_ready().map_err(Error::TransitError)? {
-        match io.write(cx, outgoing.filled()).poll() {
-            Poll::Pending => unreachable!(),
-            Poll::Ready(res) => {
-                let written = res.map_err(Error::TransitError)?;
-                log::trace!("wrote {written}B into socket");
-                outgoing.discard(written);
-                log::trace!("{}B remain in the outgoing buffer", outgoing.len());
-                false
+    let pending = if io.write_ready().map_err(Error::TransitError)? {
+        let res = {
+            let fut = pin!(io.write(outgoing.filled()));
+            match fut.poll(cx) {
+                Poll::Pending => unreachable!(),
+                Poll::Ready(res) => res,
             }
-        }
+        };
+        let written = res.map_err(Error::TransitError)?;
+        log::trace!("wrote {written}B into socket");
+        outgoing.discard(written);
+        log::trace!("{}B remain in the outgoing buffer", outgoing.len());
+        false
     } else {
         true
-    })
+    };
+
+    Ok(pending)
 }

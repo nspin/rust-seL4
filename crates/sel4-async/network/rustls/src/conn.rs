@@ -14,6 +14,7 @@ use core::task::{self, Poll};
 
 use alloc::sync::Arc;
 
+use embedded_io_async::{Read, ReadReady, Write, WriteReady};
 use futures::Future;
 use rustls::client::{ClientConnectionData, UnbufferedClientConnection};
 use rustls::pki_types::ServerName;
@@ -42,7 +43,7 @@ impl ClientConnector {
         // FIXME should not return an error but instead hoist it into a `Connect` variant
     ) -> Result<Connect<UnbufferedClientConnection, ClientConnectionData, IO>, Error<IO::Error>>
     where
-        IO: AsyncIO,
+        IO: Read + ReadReady + Write + WriteReady,
     {
         let conn = UnbufferedClientConnection::new(self.config.clone(), domain)?;
 
@@ -67,7 +68,7 @@ impl ServerConnector {
         // FIXME should not return an error but instead hoist it into a `Connect` variant
     ) -> Result<Connect<UnbufferedServerConnection, ServerConnectionData, IO>, Error<IO::Error>>
     where
-        IO: AsyncIO,
+        IO: Read + ReadReady + Write + WriteReady,
     {
         let conn = UnbufferedServerConnection::new(self.config.clone())?;
 
@@ -117,7 +118,7 @@ impl<T, D, IO> Future for Connect<T, D, IO>
 where
     D: Unpin + SideDataAugmented,
     T: Unpin + DerefMut<Target = UnbufferedConnectionCommon<D>>,
-    IO: Unpin + AsyncIO,
+    IO: Unpin + Read + ReadReady + Write + WriteReady,
 {
     type Output = Result<TlsStream<T, D, IO>, Error<IO::Error>>;
 
@@ -215,7 +216,7 @@ impl SideDataAugmented for ServerConnectionData {
 impl<T, D, IO> ConnectInner<T, D, IO>
 where
     T: DerefMut<Target = UnbufferedConnectionCommon<D>>,
-    IO: AsyncIO,
+    IO: Read + ReadReady + Write + WriteReady,
     D: SideDataAugmented,
 {
     fn advance(&mut self, updates: &mut Updates) -> Result<Action, Error<IO::Error>> {
@@ -288,6 +289,7 @@ impl<T, D, IO> TlsStream<T, D, IO> {
     }
 }
 
+#[cfg(any())]
 impl<T, D, IO> AsyncIO for TlsStream<T, D, IO>
 where
     T: DerefMut<Target = UnbufferedConnectionCommon<D>> + Unpin,
