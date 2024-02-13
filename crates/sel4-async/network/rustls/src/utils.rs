@@ -180,7 +180,7 @@ pub(crate) fn poll_write<IO>(
 where
     IO: Write + WriteReady,
 {
-    let pending = if io.write_ready().map_err(Error::TransitError)? {
+    let would_block = if io.write_ready().map_err(Error::TransitError)? {
         let res = {
             let fut = pin!(io.write(outgoing.filled()));
             match fut.poll(cx) {
@@ -197,5 +197,5 @@ where
         true
     };
 
-    Ok(pending)
+    Ok(would_block)
 }
