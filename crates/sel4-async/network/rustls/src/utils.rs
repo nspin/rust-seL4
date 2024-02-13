@@ -171,18 +171,20 @@ pub(crate) fn poll_write<IO>(
     cx: &mut task::Context,
 ) -> Result<bool, Error<IO::Error>>
 where
-    IO: AsyncIO + Unpin,
+    IO: embedded_io_async::WriteReady + embedded_io_async::Write,
 {
-    let pending = match Pin::new(io).poll_write(cx, outgoing.filled()) {
-        Poll::Ready(res) => {
-            let written = res.map_err(Error::TransitError)?;
-            log::trace!("wrote {written}B into socket");
-            outgoing.discard(written);
-            log::trace!("{}B remain in the outgoing buffer", outgoing.len());
-            false
+    Ok(if io.write_ready().map_err(Error::TransitError)? {
+        match io.write(cx, outgoing.filled()).poll() {
+            Poll::Pending => unreachable!(),
+            Poll::Ready(res) => {
+                let written = res.map_err(Error::TransitError)?;
+                log::trace!("wrote {written}B into socket");
+                outgoing.discard(written);
+                log::trace!("{}B remain in the outgoing buffer", outgoing.len());
+                false
+            }
         }
-
-        Poll::Pending => true,
-    };
-    Ok(pending)
+    } else {
+        true
+    })
 }
