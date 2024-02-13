@@ -289,20 +289,17 @@ impl<T, D, IO> TlsStream<T, D, IO> {
     }
 }
 
-#[cfg(any())]
-impl<T, D, IO> AsyncIO for TlsStream<T, D, IO>
+impl<T, D, IO> TlsStream<T, D, IO>
 where
     T: DerefMut<Target = UnbufferedConnectionCommon<D>> + Unpin,
-    IO: AsyncIO + Unpin,
+    IO: Read + ReadReady + Write + WriteReady + Unpin,
     D: SideDataAugmented + Unpin,
 {
-    type Error = Error<IO::Error>;
-
     fn poll_write(
         mut self: Pin<&mut Self>,
         cx: &mut task::Context<'_>,
         buf: &[u8],
-    ) -> Poll<Result<usize, Self::Error>> {
+    ) -> Poll<Result<usize, <Self as embedded_io_async::ErrorType>::Error>> {
         let mut outgoing = mem::take(&mut self.outgoing);
 
         // no IO here; just in-memory writes
@@ -346,7 +343,7 @@ where
         mut self: Pin<&mut Self>,
         cx: &mut task::Context<'_>,
         buf: &mut [u8],
-    ) -> Poll<Result<usize, Self::Error>> {
+    ) -> Poll<Result<usize, <Self as embedded_io_async::ErrorType>::Error>> {
         let mut incoming = mem::take(&mut self.incoming);
         let mut cursor = WriteCursor::new(buf);
 
@@ -401,6 +398,7 @@ where
         Poll::Ready(Ok(cursor.into_used()))
     }
 
+    #[cfg(any())]
     fn poll_flush(
         mut self: Pin<&mut Self>,
         cx: &mut task::Context<'_>,
@@ -424,6 +422,7 @@ where
             .map_err(Error::TransitError)
     }
 
+    #[cfg(any())]
     #[allow(unused_mut)]
     fn poll_close(
         mut self: Pin<&mut Self>,
@@ -434,4 +433,11 @@ where
             .poll_close(cx)
             .map_err(Error::TransitError)
     }
+}
+
+impl<T, D, IO> embedded_io_async::ErrorType for TlsStream<T, D, IO>
+where
+    IO: embedded_io_async::ErrorType,
+{
+    type Error = Error<IO::Error>;
 }
