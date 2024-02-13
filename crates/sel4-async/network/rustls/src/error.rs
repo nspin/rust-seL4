@@ -33,3 +33,10 @@ impl<E> From<EncryptError> for Error<E> {
         Self::EncryptError(err)
     }
 }
+
+impl<E: embedded_io_async::Error> embedded_io_async::Error for Error<E> {
+    // TODO
+    fn kind(&self) -> embedded_io_async::ErrorKind {
+        embedded_io_async::ErrorKind::Other
+    }
+}
