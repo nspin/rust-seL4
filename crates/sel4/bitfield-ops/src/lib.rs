@@ -4,7 +4,29 @@
 // SPDX-License-Identifier: BSD-2-Clause
 //
 
-#![no_std]
+#![cfg_attr(not(feature = "verus"), no_std)]
+
+#[cfg(feature = "verus")]
+#[allow(dead_code)]
+fn main() {}
+
+#[cfg(not(feature = "verus"))]
+macro_rules! verus {
+    ($($tt:tt)*) => {
+        $($tt)*
+    }
+}
+
+#[cfg(feature = "verus")]
+use builtin::*;
+
+#[cfg(feature = "verus")]
+use builtin_macros::*;
+
+#[cfg(feature = "verus")]
+use vstd::*;
+
+verus! {
 
 use core::marker::PhantomData;
 use core::mem;
@@ -349,6 +371,8 @@ impl<T: AsMut<[U]>, U: UnsignedPrimInt> Bitfield<T, U> {
         set(self.bits_mut(), start_bit, src)
     }
 }
+
+} // verus!
 
 // // //
 

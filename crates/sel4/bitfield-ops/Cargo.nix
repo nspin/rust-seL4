@@ -8,4 +8,7 @@
 
 mk {
   package.name = "sel4-bitfield-ops";
+  features = {
+    verus = [];
+  };
 }
