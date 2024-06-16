@@ -7,7 +7,7 @@
 #![no_std]
 #![no_main]
 
-use sel4_microkit::{debug_println, protection_domain, Channel, Handler, Infallible};
+use sel4_microkit::{debug_println, protection_domain, Channel, Handler};
 
 const SERVER: Channel = Channel::new(0);
 
@@ -20,8 +20,6 @@ fn init() -> impl Handler {
 struct HandlerImpl {}
 
 impl Handler for HandlerImpl {
-    type Error = Infallible;
-
     fn notified(&mut self, _channel: Channel) -> Result<(), Self::Error> {
         debug_println!("TEST_PASS");
         Ok(())

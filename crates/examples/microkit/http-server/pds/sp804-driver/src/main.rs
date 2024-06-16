@@ -9,9 +9,7 @@
 
 use core::time::Duration;
 
-use sel4_microkit::{
-    memory_region_symbol, protection_domain, Channel, Handler, Infallible, MessageInfo,
-};
+use sel4_microkit::{memory_region_symbol, protection_domain, Channel, Handler, MessageInfo};
 use sel4_microkit_message::MessageInfoExt as _;
 
 use microkit_http_server_example_sp804_driver_core::Driver;
@@ -37,8 +35,6 @@ struct HandlerImpl {
 }
 
 impl Handler for HandlerImpl {
-    type Error = Infallible;
-
     fn notified(&mut self, channel: Channel) -> Result<(), Self::Error> {
         match channel {
             channels::DEVICE => {

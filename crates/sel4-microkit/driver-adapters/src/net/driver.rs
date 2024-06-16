@@ -14,7 +14,7 @@ use smoltcp::{
 
 use sel4_driver_interfaces::{GetMacAddress, HandleInterrupt};
 use sel4_externally_shared::ExternallySharedRef;
-use sel4_microkit::{Channel, Handler, Infallible, MessageInfo};
+use sel4_microkit::{Channel, Handler, MessageInfo};
 use sel4_microkit_message::MessageInfoExt as _;
 use sel4_shared_ring_buffer::{roles::Use, RingBuffers};
 
@@ -50,8 +50,6 @@ impl<Device> Driver<Device> {
 }
 
 impl<Device: phy::Device + HandleInterrupt + GetMacAddress> Handler for Driver<Device> {
-    type Error = Infallible;
-
     fn notified(&mut self, channel: Channel) -> Result<(), Self::Error> {
         if channel == self.device_channel || channel == self.client_channel {
             let mut notify_rx = false;

@@ -5,8 +5,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 //
 
-use core::convert::Infallible;
-
 use embedded_hal_nb::nb;
 use embedded_hal_nb::serial;
 use heapless::Deque;
@@ -51,8 +49,6 @@ impl<Device> Handler for Driver<Device>
 where
     Device: serial::Read<u8> + serial::Write<u8> + HandleInterrupt,
 {
-    type Error = Infallible;
-
     fn notified(&mut self, channel: Channel) -> Result<(), Self::Error> {
         if channel == self.serial {
             while !self.buffer.is_full() {

@@ -20,7 +20,7 @@ use sel4_async_network::{DhcpOverrides, ManagedInterface};
 use sel4_async_single_threaded_executor::{LocalPool, LocalSpawner};
 use sel4_async_time::{Instant, TimerManager};
 use sel4_bounce_buffer_allocator::Basic;
-use sel4_microkit::{Channel, Handler, Infallible};
+use sel4_microkit::{Channel, Handler};
 use sel4_shared_ring_buffer_block_io::SharedRingBufferBlockIO;
 
 use crate::{DeviceImpl, TimerClient};
@@ -137,8 +137,6 @@ impl HandlerImpl {
 }
 
 impl Handler for HandlerImpl {
-    type Error = Infallible;
-
     fn notified(&mut self, channel: Channel) -> Result<(), Self::Error> {
         self.react(
             channel == self.timer_driver_channel,

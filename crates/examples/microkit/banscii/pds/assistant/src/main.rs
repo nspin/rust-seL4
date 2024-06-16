@@ -21,9 +21,7 @@ use sel4_externally_shared::{
     access::{ReadOnly, ReadWrite},
     ExternallySharedRef, ExternallySharedRefExt,
 };
-use sel4_microkit::{
-    memory_region_symbol, protection_domain, Channel, Handler, Infallible, MessageInfo,
-};
+use sel4_microkit::{memory_region_symbol, protection_domain, Channel, Handler, MessageInfo};
 use sel4_microkit_driver_adapters::serial::client::{
     Client as SerialClient, Error as SerialClientError,
 };
@@ -71,8 +69,6 @@ struct HandlerImpl {
 }
 
 impl Handler for HandlerImpl {
-    type Error = Infallible;
-
     fn notified(&mut self, channel: Channel) -> Result<(), Self::Error> {
         match channel {
             SERIAL_DRIVER => {

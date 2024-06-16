@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 //
 
+use core::convert::Infallible;
 use core::fmt;
 
 use sel4_microkit_base::MessageInfo;
@@ -12,8 +13,6 @@ use crate::{
     defer::{DeferredAction, PreparedDeferredAction},
     pd_is_passive, Channel,
 };
-
-pub use core::convert::Infallible;
 
 const INPUT_CAP: sel4::cap::Endpoint = sel4::Cap::from_bits(1);
 const REPLY_CAP: sel4::cap::Reply = sel4::Cap::from_bits(4);
@@ -24,7 +23,7 @@ const EVENT_TYPE_MASK: sel4::Word = 1 << (sel4::WORD_SIZE - 1);
 /// Trait for the application-specific part of a protection domain's main loop.
 pub trait Handler {
     /// Error type returned by this protection domain's entrypoints.
-    type Error: fmt::Display;
+    type Error: fmt::Display = Infallible;
 
     /// This method has the same meaning and type as its analog in `libmicrokit`.
     ///
@@ -119,6 +118,4 @@ impl NullHandler {
     }
 }
 
-impl Handler for NullHandler {
-    type Error = Infallible;
-}
+impl Handler for NullHandler {}

@@ -4,8 +4,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 //
 
-use core::convert::Infallible;
-
 use rtcc::DateTimeAccess;
 
 use sel4_microkit::{Channel, Handler, MessageInfo};
@@ -30,8 +28,6 @@ impl<Device> Handler for Driver<Device>
 where
     Device: DateTimeAccess,
 {
-    type Error = Infallible;
-
     fn protected(
         &mut self,
         channel: Channel,

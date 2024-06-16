@@ -15,9 +15,7 @@ use sel4_externally_shared::{
     access::{ReadOnly, ReadWrite},
     ExternallySharedRef, ExternallySharedRefExt,
 };
-use sel4_microkit::{
-    memory_region_symbol, protection_domain, Channel, Handler, Infallible, MessageInfo,
-};
+use sel4_microkit::{memory_region_symbol, protection_domain, Channel, Handler, MessageInfo};
 use sel4_microkit_message::MessageInfoExt as _;
 
 use banscii_artist_interface_types::*;
@@ -55,8 +53,6 @@ struct HandlerImpl {
 }
 
 impl Handler for HandlerImpl {
-    type Error = Infallible;
-
     fn protected(
         &mut self,
         channel: Channel,

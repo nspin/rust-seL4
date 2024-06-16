@@ -47,7 +47,7 @@ mod printing;
 pub mod panicking;
 
 pub use defer::{DeferredAction, DeferredActionInterface, DeferredActionSlot};
-pub use handler::{Handler, Infallible, NullHandler};
+pub use handler::{Handler, NullHandler};
 pub use printing::{debug_print, debug_println};
 
 /// Declares the initialization function, stack size, and, optionally, heap and heap size.
