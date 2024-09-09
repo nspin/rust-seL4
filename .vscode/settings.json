@@ -1,0 +1,11 @@
+{
+    "rust-analyzer.check.workspace": false,
+    "rust-analyzer.linkedProjects": [
+        "crates/sel4-one-ref-cell/Cargo.toml"
+    ],
+    "rust-analyzer.files.excludeDirs": [
+        "crates/sel4-generate-target-specs"
+    ],
+    "rust-analyzer.procMacro.enable": false,
+    "rust-analyzer.check.command": "clippy",
+}

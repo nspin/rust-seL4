@@ -11,4 +11,7 @@ mk {
   dependencies = {
     inherit (versions) serde_json clap;
   };
+  package.metadata.rust-analyzer = {
+    rustc_private = true;
+  };
 }
