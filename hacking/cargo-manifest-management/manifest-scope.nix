@@ -110,8 +110,8 @@ in rec {
     object = "0.36.1";
     pin-project = "1.1.3";
     postcard = "1.0.2";
-    proc-macro2 = "1.0.50";
-    quote = "1.0.23";
+    proc-macro2 = "1.0.83";
+    quote = "1.0.35";
     rand = "0.8.5";
     rtcc = "0.3.2";
     rustc_version = "0.4.0";
@@ -120,7 +120,7 @@ in rec {
     serde_json = "1.0.87";
     serde_yaml = "0.9.14";
     smoltcp = "0.10.0";
-    syn = "1.0.107";
+    syn = "2.0.77";
     synstructure = "0.12.6";
     thiserror = "1.0";
     tock-registers = "0.8.1";
