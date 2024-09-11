@@ -18,7 +18,7 @@ license = "BSD-2-Clause"
 
 [dependencies]
 fallible-iterator = "0.2.0"
-proc-macro2 = "1.0.50"
-quote = "1.0.23"
+proc-macro2 = "1.0.83"
+quote = "1.0.35"
 sel4-config-generic-types = { path = "types" }
-syn = { version = "1.0.107", features = ["full"] }
+syn = { version = "2.0.77", features = ["full"] }
