@@ -66,6 +66,13 @@ in rec {
     local = localRoot + "/microkit";
   };
 
+  sddf = fetchGit {
+    url = "https://github.com/au-ts/sddf";
+    rev = "cfe68b07288e844d2787bda3b1b74acc8f749fe3";
+    local = localRoot + "/sddf";
+    useLocal = true;
+  };
+
   capdlTool = fetchGit (capdlCommon // {
     andThen = "/capDL-tool";
   });

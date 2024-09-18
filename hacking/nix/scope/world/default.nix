@@ -116,6 +116,8 @@ self: with self;
     jq . $jsonPath > $out
   '';
 
+  sddf = callPackage ./sddf {};
+
   mkTask = callPackage ./mk-task.nix {};
 
   sel4-capdl-initializer = callPackage ./capdl/sel4-capdl-initializer.nix {};

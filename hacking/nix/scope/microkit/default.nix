@@ -132,6 +132,8 @@ let
         '';
       });
 
+  toolExe = "${tool}/bin/microkit";
+
   mkLoader =
     { systemXML
     , searchPath
@@ -144,7 +146,7 @@ let
     } ''
       mkdir $out
       MICROKIT_SDK=${sdk} \
-        ${tool}/bin/microkit ${systemXML} \
+        ${toolExe} ${systemXML} \
           --search-path ${lib.concatStringsSep " " searchPath} \
           --board ${board} \
           --config ${config} \
@@ -175,7 +177,8 @@ let
 
 in rec {
   inherit
-    sdk tool
+    board config
+    sdk tool toolExe
     mkSystem
   ;
 }
