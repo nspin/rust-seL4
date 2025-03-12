@@ -122,9 +122,7 @@ let
         dontFixup = true;
 
         configurePhase = ''
-          d=.cargo
-          mkdir $d
-          cp ${cargoConfigFile} $d/config.toml
+          cat ${cargoConfigFile} >> .cargo/config.toml
         '';
 
         buildPhase = ''
