@@ -75,7 +75,7 @@ let
 
     buildPhase = ''
       python3 build_sdk.py \
-        --sel4=${kernelSourcePatched} \
+        --sel4 ${kernelSourcePatched} \
         --boards ${board} \
         --configs ${config} \
         --toolchain-prefix-${sdkArch} ${lib.removeSuffix "-" stdenv.cc.targetPrefix} \
