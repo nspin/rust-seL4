@@ -78,7 +78,7 @@ let
         --sel4=${kernelSourcePatched} \
         --boards ${board} \
         --configs ${config} \
-        --toolchain-prefix-${sdkArch}=${lib.removeSuffix "-" stdenv.cc.targetPrefix} \
+        --toolchain-prefix-${sdkArch} ${lib.removeSuffix "-" stdenv.cc.targetPrefix} \
         --skip-tool \
         --skip-docs \
         --skip-tar
